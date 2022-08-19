@@ -1,0 +1,2 @@
+LZO: https://github.com/zivillian/lzo.net
+LZSS: https://github.com/Nanook/Queen-Bee
