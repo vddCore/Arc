@@ -13,16 +13,16 @@ namespace Arc
         private Stream _stream;
         private DataReader _dataReader;
 
-        public Container(string filePath)
+        public Container(string filePath, Endian defaultEndian = Endian.Little)
         {
             _stream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-            _dataReader = new DataReader(_stream);
+            _dataReader = new DataReader(_stream) { IsBigEndian = defaultEndian == Endian.Big };
         }
 
-        public Container(Stream stream)
+        public Container(Stream stream, Endian defaultEndian = Endian.Little)
         {
             _stream = stream;
-            _dataReader = new DataReader(_stream);
+            _dataReader = new DataReader(_stream) { IsBigEndian = defaultEndian == Endian.Big };
         }
 
         public Container Offset(long offset, SeekOrigin origin = SeekOrigin.Current)
@@ -73,7 +73,16 @@ namespace Arc
             return this;
         }
 
-        public Container Parse<T>(out T[] segments, int count = 1)
+        public Container Parse<T>(out T segment)
+            where T : Segment, new()
+        {
+            segment = new T();
+            segment.Read(_dataReader);
+
+            return this;
+        }
+
+        public Container Parse<T>(out T[] segments, int count)
             where T : Segment, new()
         {
             segments = new T[count];
